@@ -1,0 +1,13 @@
+[package]
+name = "rust-agenda"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+chrono = "0.4.23"
+yew = "0.19.3"
+wasm-bindgen = "0.2.79"
+web-sys = {version = "0.3.56", features = ["HtmlInputElement"]} 
+gloo = "0.8.0"

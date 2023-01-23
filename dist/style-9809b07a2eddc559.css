@@ -1,0 +1,22 @@
+body {
+    background-color: #370D32;
+    color: white;
+}
+
+.cards_container {
+    width: 800px;
+    height: 500px;
+}
+
+.card {
+    font-size: 10px;
+    background-color: darkslategray;
+    width: 200px;
+    aspect-ratio: 2/1;
+    padding: 10px;
+}
+
+.card p {
+    white-space: pre-wrap;
+    overflow-wrap: break-word;    
+}
