@@ -4,15 +4,16 @@ body {
 }
 
 .cards_container {
-    width: 800px;
-    height: 500px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-gap: 15px;
 }
 
 .card {
-    font-size: 10px;
+    font-size: 15px;
     background-color: darkslategray;
-    width: 200px;
-    aspect-ratio: 2/1;
+    aspect-ratio: 100/1;
+    border: 1px solid #ccc;
     padding: 10px;
 }
 

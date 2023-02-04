@@ -9,7 +9,7 @@ use crate::components::cards_container::{CardsContainer, Card};
 pub fn app() -> Html {
     let cards = vec![
         Card{
-            owner: "Jaw".to_owned(),
+            owner: "Mocked Jaw".to_owned(),
             date: Utc::now().to_string(),
             text: "Hoje estava na reuniao com o Will e o Aru e tiraram sarro de mim :`((((".to_owned(),
         },
