@@ -21,3 +21,20 @@ body {
     white-space: pre-wrap;
     overflow-wrap: break-word;    
 }
+
+.card_form textarea {
+    font-size: 15px;
+    width: 1600px;
+    height: 200px;
+    background-color: darkslategray;
+    color: white;
+}
+
+.card_form input {
+    font-size: 15px;
+    width: 1600px;
+    height: 30px;
+    background-color: darkslategray;
+    color: white;
+    text-align: center;
+}
