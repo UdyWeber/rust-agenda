@@ -4,3 +4,5 @@ backend:
 	cd ./back-end && cargo run
 frontend:
 	cd ./front-end && trunk serve
+migrate:
+	cd ./back-end && diesel migration run
