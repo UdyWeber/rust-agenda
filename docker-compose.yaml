@@ -1,0 +1,22 @@
+version: "1.0"
+
+services:
+  postgres:
+    image: postgres:14
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "33124:33124"
+    expose:
+      - "33124"
+    environment:
+      POSTGRES_USER: "agenda"
+      POSTGRES_PASSWORD: "agenda#1234"
+      POSTGRES_DB: "agendadb"
+    logging:
+      options:
+        max-size: "10m"
+    command: [ "postgres", "-c", "log_statement=all", "-p", "33124"]
+
+volumes:
+  postgres_data:
