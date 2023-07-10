@@ -1,2 +1,3 @@
 - Left to do:
     - IMPLEMENT ALL METHODS FOR CRUD!
+    - Implement sort of Query controller for each structure
