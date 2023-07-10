@@ -1,4 +1,5 @@
-use std::env::var;
+use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
+use diesel_async::RunQueryDsl;
 
 use axum::{
     extract::State,
@@ -8,33 +9,24 @@ use axum::{
     response::Response,
 };
 
-use crate::generics::Pool;
+use crate::{
+    database::{
+        models::user::SelectableUser,
+        schema::{auth_token, users},
+    },
+    generics::Pool,
+};
 
 use super::{router::UserState, utils::internal_error};
 
 pub async fn guard_middleware<T>(
     mut request: Request<T>,
     next: Next<T>,
-    // State(pool): State<Pool>,
+    State(pool): State<Pool>,
 ) -> Result<Response, (StatusCode, String)> {
-    // let connection = pool
-    //     .get_owned()
-    //     .await
-    //     .map_err(internal_error)
-    //     .unwrap();
+    let mut connection = pool.get_owned().await.map_err(internal_error).unwrap();
 
-    let auth_token = match var("REQUEST_AUTH_TOKEN") {
-        Ok(token) => token,
-        Err(e) => return Err((StatusCode::INTERNAL_SERVER_ERROR, e.to_string())),
-    };
-
-    // Setting Up Middle Extension to get in other routes
-    request.extensions_mut().insert(UserState {
-        name: "Waj".to_owned(),
-    });
-
-    // Token Based Authorization using typed_headers
-    let token = request
+    let header_token = request
         .headers()
         .typed_get::<Authorization<Bearer>>()
         .ok_or((
@@ -43,13 +35,23 @@ pub async fn guard_middleware<T>(
         ))?
         .token()
         .to_owned();
+        
+    let token_user = users::table
+        .inner_join(auth_token::table.on(auth_token::user_id.eq(users::id)))
+        .select(SelectableUser::as_select())
+        .filter(auth_token::token.eq(header_token))
+        .first::<SelectableUser>(&mut connection)
+        .await;
 
-    // Matching auth
-    match auth_token == token {
-        true => Ok(next.run(request).await),
-        false => Err((
-            StatusCode::UNAUTHORIZED,
-            "Token doesnt match with requirements".to_owned(),
-        )),
+    match token_user{
+        Ok(logged_user) => {
+            request.extensions_mut().insert(UserState {
+                user: logged_user,
+            });
+            Ok(next.run(request).await)
+        },
+        Err(_) => {
+            Err((StatusCode::UNAUTHORIZED, "Token does't match with any users".to_owned()))
+        },
     }
 }

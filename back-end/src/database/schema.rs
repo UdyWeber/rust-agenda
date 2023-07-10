@@ -32,8 +32,4 @@ diesel::table! {
 diesel::joinable!(auth_token -> users (user_id));
 diesel::joinable!(cards -> users (user_id));
 
-diesel::allow_tables_to_appear_in_same_query!(
-    auth_token,
-    cards,
-    users,
-);
+diesel::allow_tables_to_appear_in_same_query!(auth_token, cards, users,);

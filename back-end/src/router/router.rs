@@ -1,21 +1,20 @@
-use axum::{
-    http::StatusCode,
-    middleware,
-    routing::{get, post},
-    Router,
-};
+use axum::{middleware, routing::get, Router};
 
-use super::guard::guard_middleware;
-use crate::generics::Pool;
+use super::{guard::guard_middleware, routes::wellcome_route::wellcome};
+use crate::{database::models::user::SelectableUser, generics::Pool};
 
 #[derive(Clone)]
 pub struct UserState {
-    pub name: String,
+    pub user: SelectableUser,
 }
 
 pub fn mount_router(db_connection_pool: Pool) -> Router {
     Router::new()
-        .layer(middleware::from_fn(guard_middleware))
+        .route("/", get(wellcome))
+        .layer(middleware::from_fn_with_state(
+            db_connection_pool.clone(),
+            |state, req, next| guard_middleware(req, next, state),
+        ))
         .with_state(db_connection_pool)
-        .route("/", get(|| async { (StatusCode::OK, ("Root route :D")) }))
+        
 }
