@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS users (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     name varchar(255) NOT NULL,
     email varchar(255) NOT NULL,
-    password varchar(255) NOT NULL,
+    password text NOT NULL,
     password_salt varchar(255) NOT NULL,
     date_created timestamp default now()
 );

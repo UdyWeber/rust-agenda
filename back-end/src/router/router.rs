@@ -1,6 +1,13 @@
-use axum::{middleware, routing::get, Router};
+use axum::{
+    middleware,
+    routing::{get, post},
+    Router,
+};
 
-use super::{guard::guard_middleware, routes::wellcome_route::wellcome};
+use super::{
+    guard::guard_middleware,
+    routes::{login::login, user::create_user, wellcome_route::wellcome},
+};
 use crate::{database::models::user::SelectableUser, generics::Pool};
 
 #[derive(Clone)]
@@ -15,6 +22,7 @@ pub fn mount_router(db_connection_pool: Pool) -> Router {
             db_connection_pool.clone(),
             |state, req, next| guard_middleware(req, next, state),
         ))
+        .route("/user", post(create_user))
+        .route("/login", post(login))
         .with_state(db_connection_pool)
-        
 }

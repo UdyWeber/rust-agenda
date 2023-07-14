@@ -23,7 +23,7 @@ diesel::table! {
         id -> Uuid,
         name -> Varchar,
         email -> Varchar,
-        password -> Varchar,
+        password -> Text,
         password_salt -> Varchar,
         date_created -> Nullable<Timestamp>,
     }

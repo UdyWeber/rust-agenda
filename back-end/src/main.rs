@@ -3,6 +3,7 @@ use std::{env::var, net::SocketAddr};
 
 mod database;
 mod router;
+mod utils;
 
 use {database::db::establish_connection, router::router::mount_router};
 

@@ -1,7 +1,12 @@
-use diesel_async::pooled_connection::AsyncDieselConnectionManager;
+use diesel_async::{
+    pooled_connection::{bb8::PooledConnection, AsyncDieselConnectionManager},
+    AsyncPgConnection,
+};
 use std::env::var;
 
 use crate::generics::Pool;
+
+pub type DbConnection<'a> = PooledConnection<'a, AsyncPgConnection>;
 
 pub async fn establish_connection() -> Pool {
     let db_url = var("DATABASE_URL").unwrap();

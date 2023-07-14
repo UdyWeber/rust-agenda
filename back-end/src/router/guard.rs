@@ -1,6 +1,3 @@
-use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, SelectableHelper};
-use diesel_async::RunQueryDsl;
-
 use axum::{
     extract::State,
     headers::{authorization::Bearer, Authorization, HeaderMapExt},
@@ -9,13 +6,7 @@ use axum::{
     response::Response,
 };
 
-use crate::{
-    database::{
-        models::user::SelectableUser,
-        schema::{auth_token, users},
-    },
-    generics::Pool,
-};
+use crate::{database::models::auth_token::AuthTokenQueries, generics::Pool};
 
 use super::{router::UserState, utils::internal_error};
 
@@ -24,7 +15,7 @@ pub async fn guard_middleware<T>(
     next: Next<T>,
     State(pool): State<Pool>,
 ) -> Result<Response, (StatusCode, String)> {
-    let mut connection = pool.get_owned().await.map_err(internal_error).unwrap();
+    let connection = pool.get_owned().await.map_err(internal_error).unwrap();
 
     let header_token = request
         .headers()
@@ -35,23 +26,21 @@ pub async fn guard_middleware<T>(
         ))?
         .token()
         .to_owned();
-        
-    let token_user = users::table
-        .inner_join(auth_token::table.on(auth_token::user_id.eq(users::id)))
-        .select(SelectableUser::as_select())
-        .filter(auth_token::token.eq(header_token))
-        .first::<SelectableUser>(&mut connection)
+
+    let token_user = AuthTokenQueries { connection }
+        .get_auth_user_by_token(header_token)
         .await;
 
-    match token_user{
+    match token_user {
         Ok(logged_user) => {
-            request.extensions_mut().insert(UserState {
-                user: logged_user,
-            });
+            request
+                .extensions_mut()
+                .insert(UserState { user: logged_user });
             Ok(next.run(request).await)
-        },
-        Err(_) => {
-            Err((StatusCode::UNAUTHORIZED, "Token does't match with any users".to_owned()))
-        },
+        }
+        Err(_) => Err((
+            StatusCode::UNAUTHORIZED,
+            "Token does't match with any users".to_owned(),
+        )),
     }
 }
