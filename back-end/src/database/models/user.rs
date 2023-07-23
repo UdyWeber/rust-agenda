@@ -9,13 +9,10 @@ use uuid::Uuid;
 use crate::{
     database::{
         db::DbConnection,
-        schema::{auth_token, users},
+        schema::users,
     },
     utils::security::generate_password_salt,
 };
-
-use super::auth_token::InsertableAuthToken;
-
 // REMEMBER: To query the structure you must have the whole structure defined here no excuses
 #[derive(Serialize, Queryable, Debug, Identifiable, Clone, PartialEq, Selectable)]
 #[diesel(table_name = users)]
@@ -70,12 +67,6 @@ impl UserQueries<'_> {
             .values(user_data)
             .get_result::<SelectableUser>(&mut self.connection)
             .await
-    }
-    pub async fn insert_auth_token(&mut self, token_data: InsertableAuthToken) {
-        let _ = diesel::insert_into(auth_token::table)
-            .values(token_data)
-            .execute(&mut self.connection)
-            .await;
     }
 }
 

@@ -63,7 +63,7 @@ impl AuthTokenQueries<'_> {
             .await
     }
     pub async fn insert_auth_token(&mut self, token_data: InsertableAuthToken) {
-        diesel::insert_into(auth_token::table)
+        let _ = diesel::insert_into(auth_token::table)
             .values(token_data)
             .execute(&mut self.connection)
             .await;
